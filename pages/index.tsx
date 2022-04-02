@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { Button, Card, CardContent, CardHeader, Container, Feed, Form, FormComponent, Header, Icon, Menu, Segment, SegmentGroup, TextArea } from 'semantic-ui-react';
+import { Button, Card, CardContent, CardHeader, Container, Feed, Form, FormComponent, Header, Icon, Label, Menu, Message, Segment, SegmentGroup, TextArea } from 'semantic-ui-react';
 import { useQuery, useMutation, gql } from '@apollo/client'
 import { useState } from 'react';
 
@@ -96,9 +96,13 @@ const PostLoader = () => {
     }
   `)
 
-  if (loading) return <p>Loading...</p>
+  if (loading) return <SegmentGroup ><Segment loading={true}>loading...</Segment></SegmentGroup>
 
-  if (error) return <p>Error! {JSON.stringify(error)}</p>
+  if (error) return <Message error>
+    <Header>Error!</Header>
+    <Segment inverted><code>{JSON.stringify(error)}</code></Segment>
+  </Message>
+
   if (!data) return <p>No data</p>
 
   const { latestPosts } = data
