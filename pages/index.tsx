@@ -2,8 +2,9 @@ import type { NextPage } from 'next'
 import Head from 'next/head'
 import Image from 'next/image'
 import styles from '../styles/Home.module.css'
-import { Button, Card, CardContent, CardHeader, Container, Feed, Form, Header, Icon, Menu, Segment, SegmentGroup, TextArea } from 'semantic-ui-react';
-import { useQuery, gql } from '@apollo/client'
+import { Button, Card, CardContent, CardHeader, Container, Feed, Form, FormComponent, Header, Icon, Menu, Segment, SegmentGroup, TextArea } from 'semantic-ui-react';
+import { useQuery, useMutation, gql } from '@apollo/client'
+import { useState } from 'react';
 
 interface Post {
   id: string
@@ -21,20 +22,42 @@ const MainHeader = () => {
   </Menu>
 }
 
+interface AddPostData {
+  post: Post
+}
+const submitPost = (body: string) => { }
+
 const PostContainer = () => {
+  let input: TextArea;
+
+  const [value, setValue] = useState("")
+
+  const [mutateFunction, result] = useMutation<AddPostData>(gql`
+    mutation($body: String!) {
+      addPost(body: $body) {
+        id
+      }
+    }
+  `)
+
   return <Card>
     <CardHeader>しょうもない事を投稿しよう</CardHeader>
     <CardContent>
       <Form>
         <Form.Field>
           <label>投稿</label>
-          <TextArea lines={2} placeholder={"スタバのトイレでうんこした"} className={`attached segment`} />
+          <TextArea value={value} onChange={e => setValue(e.target.value)} lines={2} placeholder={"スタバのトイレでうんこした"} className={`attached segment`} ref={node => {
+            input = node!;
+          }} />
 
-          <Button attached="bottom" primary>投稿</Button>
+          <Button type="submit" attached="bottom" primary onClick={(e) => {
+            console.log(input.state);
+            mutateFunction({ variables: { body: input.props.value! as string } })
+          }}>投稿</Button>
         </Form.Field>
       </Form>
     </CardContent>
-  </Card>
+  </Card >
 }
 
 interface ShoumonaProps {
@@ -84,7 +107,7 @@ const PostLoader = () => {
   console.log(latestPosts)
 
   return <SegmentGroup className={`basic`}>
-    {latestPosts.map((post) => <Segment><Shoumona body={post.body} userId={post.userId} /></Segment>)}
+    {latestPosts.map((post) => <Segment key={post.id}><Shoumona body={post.body} userId={post.userId} /></Segment>)}
   </SegmentGroup>
 }
 
