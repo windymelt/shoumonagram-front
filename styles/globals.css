@@ -14,3 +14,7 @@ a {
 * {
   box-sizing: border-box;
 }
+
+main {
+  padding-top: 100px;
+}
